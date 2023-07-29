@@ -1,0 +1,20 @@
+# .gitignore
+
+# Python
+__pycache__/
+
+# Django
+*.log
+*.pot
+*.pyc
+*.pyo
+*.rej
+*~
+
+#DB
+*.sqlite3
+*.db
+*.db.*
+
+# Environments
+venv/
