@@ -27,3 +27,6 @@ myproject/settings_local.py
 
 # Ignore virtual environment
 venv/
+
+.DS_Store
+**/.DS_Store
