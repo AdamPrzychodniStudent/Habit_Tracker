@@ -1,0 +1,31 @@
+{% extends "habit_tracker/base.html" %}
+
+{% block content %}
+  <h2>Habit list</h2>
+
+  {% if messages %}
+  <!-- Message Modal -->
+  <div id="messageModal" class="modal">
+    <div class="modal-content">
+      <span class="close-button">&times;</span>
+      {% for message in messages %}
+      <p{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <ul>
+    {% for habit in habits %}
+      <li>{{ habit.name }} ({{ habit.period }})</li>
+    {% empty %}
+      <li>No active habits yet.</li>
+    {% endfor %}
+  </ul>
+
+  <!-- Link to the create_habit view -->
+  <p>
+    <a href="{% url 'create_habit' %}" class="btn">Create a new habit</a>
+  </p>
+{% endblock %}
+

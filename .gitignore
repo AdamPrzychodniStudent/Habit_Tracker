@@ -1,20 +1,32 @@
 # .gitignore
 
-# Python
-__pycache__/
+# Ignore migrations
+**/migrations/
+!**/migrations/__init__.py
 
-# Django
-*.log
-*.pot
+# Ignore all bytecode
+**/__pycache__/
+
+# Ignore the SQLite database file
+db.sqlite3
+
+# Ignore any .pyc files
 *.pyc
+
+# Ignore any .pyo files
 *.pyo
-*.rej
-*~
 
-#DB
-*.sqlite3
-*.db
-*.db.*
+# Ignore any .pyd files
+*.pyd
 
-# Environments
+# Ignore all log files
+*.log
+
+# Ignore all local settings
+myproject/settings_local.py
+
+# Ignore virtual environment
 venv/
+
+.DS_Store
+**/.DS_Store

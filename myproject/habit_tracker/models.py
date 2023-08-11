@@ -1,3 +1,22 @@
 from django.db import models
+from django.contrib.auth.models import User
 
-# Create your models here.
+class Habit(models.Model):
+    DAILY = 'Daily'
+    WEEKLY = 'Weekly'
+    MONTHLY = 'Monthly'
+
+    PERIOD_CHOICES = [
+        (DAILY, 'Daily'),
+        (WEEKLY, 'Weekly'),
+        (MONTHLY, 'Monthly'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=200)
+    period = models.CharField(max_length=7, choices=PERIOD_CHOICES, default=DAILY)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class CheckOff(models.Model):
+    habit = models.ForeignKey(Habit, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(auto_now_add=True)
