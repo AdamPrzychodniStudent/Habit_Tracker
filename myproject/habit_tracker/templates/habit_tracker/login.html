@@ -1,9 +1,12 @@
-<!-- habit_tracker/templates/habit_tracker/login.html -->
+{% extends "habit_tracker/base.html" %}
 
+{% block content %}
 <h2>Login</h2>
 
 <form method="post">
   {% csrf_token %}
   {{ form.as_p }}
-  <button type="submit">Login</button>
+  <button type="submit" class="btn">Login</button>
 </form>
+{% endblock %}
+
