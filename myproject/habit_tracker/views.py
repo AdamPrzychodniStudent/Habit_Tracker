@@ -19,12 +19,14 @@ def create_habit(request):
     return render(request, 'habit_tracker/create_habit.html', {'form': form})
 
 
-from django.shortcuts import render
-from .models import Habit
-
 def habit_list(request):
     habits = Habit.objects.all()
     return render(request, 'habit_tracker/habit_list.html', {'habits': habits})
+
+
+def welcome(request):
+    return render(request, 'habit_tracker/welcome.html')
+
 
 
 

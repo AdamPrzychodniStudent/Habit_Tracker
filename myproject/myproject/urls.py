@@ -18,8 +18,11 @@ from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
 
+from habit_tracker import views as habit_views
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', habit_views.welcome, name='welcome'),
     path('habit_tracker/', include('habit_tracker.urls')),
     path('login/', auth_views.LoginView.as_view(template_name='habit_tracker/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
