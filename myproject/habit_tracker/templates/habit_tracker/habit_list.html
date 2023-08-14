@@ -18,6 +18,8 @@
   <ul>
     {% for habit in habits %}
       <li>{{ habit.name }} ({{ habit.period }})</li>
+      <a href="{% url 'edit_habit' habit.id %}">Edit</a>
+      </li>
     {% empty %}
       <li>No active habits yet.</li>
     {% endfor %}
