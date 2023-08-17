@@ -166,4 +166,20 @@ table tbody tr:nth-child(even) {
     background-color: #f8f8f8;
 }
 
+/* ==========================================================================
+   Checbox Styles
+   ========================================================================== */
+
+.checkbox {
+    font-size: 25px; /* Increased from 20px to make the box and checkmark bigger */
+    text-decoration: none;
+    color: #009900; /* Green color for the checkbox */
+    transition: color 0.3s; /* Smooth transition for hover effect */
+}
+
+.checkbox:hover {
+    color: #006600; /* Slightly darker shade for hover effect */
+}
+
+
 

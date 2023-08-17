@@ -20,29 +20,34 @@
         <tr>
             <th>Name</th>
             <th>Period</th>
-            <th>Completed</th>
+            <th>Done</th>
         </tr>
     </thead>
     <tbody>
         {% for habit in habits %}
         <tr>
-            <!-- Habit name as a link to the edit page -->
             <td><a href="{% url 'edit_habit' habit.id %}" class="edit-link">{{ habit.name }}</a></td>
             <td>{{ habit.period }}</td>
-            <td>{{ habit.completed }}</td>
+            <td>
+              <a href="{% url 'toggle_habit_done' habit.id %}" class="checkbox">
+                {% if habit.id in done_habits %}
+                &#10003; <!-- This is a check mark -->
+                {% else %}
+                &#9744; <!-- This is an empty square -->
+                {% endif %}
+              </a>
+            </td>                    
         </tr>
         {% empty %}
         <tr>
-            <td colspan="3">No active habits yet.</td>
+            <td colspan="3">You have no habits scheduled for today.</td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
-
 
   <!-- Link to the create_habit view -->
   <div>
       <a href="{% url 'create_habit' %}" class="btn">Create a new habit</a>
   </div>
 {% endblock %}
-

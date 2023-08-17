@@ -15,10 +15,27 @@ def welcome(request):
     return render(request, 'habit_tracker/welcome.html')
 
 
+from datetime import date
+
 @login_required
 def habit_list(request):
-    habits = Habit.objects.all()
-    return render(request, 'habit_tracker/habit_list.html', {'habits': habits})
+    today = date.today()
+
+    # Filter habits based on the start and end date
+    habits_to_do_today = Habit.objects.filter(
+        user=request.user,
+        start_date__lte=today,  # Habit's start date is less than or equal to today
+        end_date__gte=today,    # Habit's end date is greater than or equal to today
+        completed=False
+    )
+
+    # Get the IDs of the habits marked as done today
+    done_checkoffs = CheckOff.objects.filter(habit__in=habits_to_do_today, timestamp__date=today)
+    done_habits = [checkoff.habit.id for checkoff in done_checkoffs]
+
+    return render(request, 'habit_tracker/habit_list.html', {'habits': habits_to_do_today, 'done_habits': done_habits})
+
+
 
 
 @login_required
@@ -27,7 +44,7 @@ def create_habit(request):
         form = HabitForm(request.POST)
         if form.is_valid():
             habit = form.save(commit=False)
-            habit.user = request.user
+            habit.user = request.users
             habit.save()
             messages.success(request, 'Habit successfully added!')  # Add this line
             return HttpResponseRedirect('/habit_tracker/')  # Redirect to habit_list
@@ -53,5 +70,24 @@ def edit_habit(request, habit_id):
             return redirect('habit_list')
             
     return render(request, 'habit_tracker/edit_habit.html', {'habit': habit})
+
+
+from django.utils import timezone
+
+@login_required
+def toggle_habit_done(request, habit_id):
+    habit = get_object_or_404(Habit, id=habit_id)
+    
+    # Check if habit is already done today
+    today = timezone.now().date()
+    checkoff = CheckOff.objects.filter(habit=habit, timestamp__date=today).first()
+
+    if checkoff:
+        checkoff.delete()
+    else:
+        CheckOff.objects.create(habit=habit)
+    
+    return redirect('habit_list')
+
 
 
