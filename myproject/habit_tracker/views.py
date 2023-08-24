@@ -44,7 +44,7 @@ def create_habit(request):
         form = HabitForm(request.POST)
         if form.is_valid():
             habit = form.save(commit=False)
-            habit.user = request.users
+            habit.user = request.user
             habit.save()
             messages.success(request, 'Habit successfully added!')  # Add this line
             return HttpResponseRedirect('/habit_tracker/')  # Redirect to habit_list
