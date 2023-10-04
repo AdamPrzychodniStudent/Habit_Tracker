@@ -2,7 +2,7 @@
    Base & General Styles
    ========================================================================== */
 
-   .container {
+.container {
     width: 80%;
     margin: auto;
     padding: 20px;
@@ -12,20 +12,31 @@
    Button Styles
    ========================================================================== */
 
-   .btn {
+
+.button-container {
+    display: flex;  /* Flexbox layout */
+    justify-content: space-between;  /* Space between each button */
+    max-width: 100%;  /* Same as the table width */
+    margin: auto;  /* Centering the container */
+}
+
+.btn {
+    flex-basis: calc(33.33% - 10px);  /* One third of the container width minus margin */
+    margin: 5px;  /* Some margin around each button */
     background-color: #c9beacc7;
     color: #ffffff;
     padding: 12px 24px;
     margin-top: 30px;
     border: none;
-    border-radius: 10px; /* Rounded corners to match navbar and table */
+    border-radius: 10px;  /* Rounded corners to match navbar and table */
     cursor: pointer;
     text-decoration: none;
     display: inline-block;
     font-weight: bold;
     font-size: 18px;
-    transition: background-color 0.3s, transform 0.2s; /* Added transform for a subtle press effect */
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    transition: background-color 0.3s, transform 0.2s;  /* Added transform for a subtle press effect */
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);  /* Subtle shadow for depth */
+    text-align: center;  /* Center the text within each button */
 }
 
 .btn:hover {

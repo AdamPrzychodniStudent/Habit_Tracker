@@ -1,7 +1,7 @@
 {% extends "habit_tracker/base.html" %}
 
 {% block content %}
-  <h2>Habit list</h2>
+  <h2>Habit for today &#x1F642;</h2>
 
   {% if messages %}
   <!-- Message Modal -->
@@ -46,8 +46,12 @@
     </tbody>
 </table>
 
-  <!-- Link to the create_habit view -->
-  <div>
-      <a href="{% url 'create_habit' %}" class="btn">Create a new habit</a>
+  <div class="button-container">
+    <a href="{% url 'create_habit' %}" class="btn">Create a new habit</a>
+    <a href="#" class="btn">Show all current habits</a>
+    <a href="#" class="btn">Show completed habits</a>
+    <a href="#" class="btn">Show streak</a>
+    <a href="#" class="btn">How many repetitions</a>
+    <a href="#" class="btn">How many days left</a>
   </div>
 {% endblock %}
