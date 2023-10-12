@@ -1,0 +1,26 @@
+{% extends "habit_tracker/base.html" %}
+
+{% block content %}
+  <h2>Repetitions</h2>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Total Repetitions</th>
+        <th>Remaining Repetitions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for habit in habit_repetitions %}
+      <tr>
+        <td>{{ habit.name }}</td>
+        <td>{{ habit.total_reps }}</td>
+        <td>{{ habit.remaining_reps }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="button-container">
+    <a href="{% url 'show_current_habits' %}" class="btn">Go back to Current Habits</a>
+  </div>
+{% endblock %}

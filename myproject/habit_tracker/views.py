@@ -143,6 +143,35 @@ def show_streaks(request):
     return render(request, 'habit_tracker/show_streaks.html', {'streaks': sorted_streaks})
 
 
+from datetime import timedelta
+
+@login_required
+def show_repetitions(request):
+    habits = Habit.objects.filter(user=request.user)
+    habit_repetitions = []
+    
+    for habit in habits:
+        total_days = (habit.end_date - habit.start_date).days + 1
+        total_reps = 0
+        
+        if habit.period == Habit.DAILY:
+            total_reps = total_days
+        elif habit.period == Habit.WEEKLY:
+            total_reps = total_days // 7
+        elif habit.period == Habit.MONTHLY:
+            total_reps = total_days // 30  # Approximate days in a month
+        
+        # Calculate remaining repetitions
+        done_reps = CheckOff.objects.filter(habit=habit).count()
+        remaining_reps = total_reps - done_reps
+        
+        habit_repetitions.append({
+            'name': habit.name,
+            'total_reps': total_reps,
+            'remaining_reps': remaining_reps
+        })
+
+    return render(request, 'habit_tracker/show_repetitions.html', {'habit_repetitions': habit_repetitions})
 
 
 
