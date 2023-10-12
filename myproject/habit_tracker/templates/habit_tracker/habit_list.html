@@ -48,9 +48,8 @@
 
   <div class="button-container">
     <a href="{% url 'create_habit' %}" class="btn">Create a new habit</a>
-    <a href="#" class="btn">Show all current habits</a>
-    <a href="#" class="btn">Show completed habits</a>
-    <a href="#" class="btn">Show streak</a>
+    <a href="{% url 'show_current_habits' %}" class="btn">Show all current habits</a>
+    <a href="{% url 'show_completed_habits' %}" class="btn">Show completed habits</a>
     <a href="#" class="btn">How many repetitions</a>
     <a href="#" class="btn">How many days left</a>
   </div>

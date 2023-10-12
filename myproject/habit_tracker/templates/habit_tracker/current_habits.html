@@ -1,0 +1,30 @@
+{% extends "habit_tracker/base.html" %}
+
+{% block content %}
+  <h2>All Current Habits</h2>
+
+  <table border="1">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Period</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for habit in current_habits %}
+        <tr>
+            <td>{{ habit.name }}</td>
+            <td>{{ habit.period }}</td>
+            <td>{{ habit.start_date }}</td>
+            <td>{{ habit.end_date }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4">You have no current habits.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

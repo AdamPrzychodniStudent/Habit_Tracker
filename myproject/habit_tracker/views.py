@@ -72,6 +72,44 @@ def edit_habit(request, habit_id):
     return render(request, 'habit_tracker/edit_habit.html', {'habit': habit})
 
 
+from datetime import date  
+
+@login_required
+def show_current_habits(request):
+    today = date.today()
+    current_habits = Habit.objects.filter(
+        user=request.user,
+        start_date__lte=today,  # Habit's start date is less than or equal to today
+        end_date__gte=today,    # Habit's end date is greater than or equal to today
+        completed=False
+    )
+    return render(request, 'habit_tracker/current_habits.html', {'current_habits': current_habits})
+
+
+
+from datetime import date  # Don't forget to import date
+
+@login_required
+def show_completed_habits(request):
+    today = date.today()
+    completed_habits_done = Habit.objects.filter(
+        user=request.user,
+        completed=True,
+    )
+    completed_habits_time_ended = Habit.objects.filter(
+        user=request.user,
+        end_date__lt=today,
+        completed=False
+    )
+    return render(request, 'habit_tracker/completed_habits.html', {
+        'completed_habits_done': completed_habits_done,
+        'completed_habits_time_ended': completed_habits_time_ended
+    })
+
+
+
+
+
 from django.utils import timezone
 
 @login_required
