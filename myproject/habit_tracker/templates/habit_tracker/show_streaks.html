@@ -1,0 +1,24 @@
+{% extends "habit_tracker/base.html" %}
+
+{% block content %}
+  <h2>Streaks</h2>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Streak</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for streak in streaks %}
+      <tr>
+        <td>{{ streak.name }}</td>
+        <td>{{ streak.streak }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="button-container">
+    <a href="{% url 'show_completed_habits' %}" class="btn">Go back to All Completed Habits</a>
+  </div>
+{% endblock %}

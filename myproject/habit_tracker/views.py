@@ -107,6 +107,42 @@ def show_completed_habits(request):
     })
 
 
+from django.db.models import Count
+
+@login_required
+def show_streaks(request):
+    # Step 1: Identify unique habits associated with the user
+    user_habits = Habit.objects.filter(user=request.user)
+
+    streaks_data = []
+    
+    for habit in user_habits:
+        # Step 2: Fetch corresponding CheckOff records and sort them by timestamp
+        checkoffs = CheckOff.objects.filter(habit=habit).order_by('timestamp')
+
+        if checkoffs.exists():
+            streak = 1  # Initialize streak to 1 as we have at least one checkoff
+            prev_date = checkoffs.first().timestamp.date()
+
+            for checkoff in checkoffs[1:]:
+                curr_date = checkoff.timestamp.date()
+
+                if (curr_date - prev_date).days == 1:
+                    streak += 1
+                else:
+                    streak = 1  # Reset streak
+
+                prev_date = curr_date
+
+            # Step 3: Add the calculated streak to streaks_data
+            streaks_data.append({'name': habit.name, 'streak': streak})
+
+    # Sort the streaks_data by streak length
+    sorted_streaks = sorted(streaks_data, key=lambda x: x['streak'], reverse=True)
+
+    return render(request, 'habit_tracker/show_streaks.html', {'streaks': sorted_streaks})
+
+
 
 
 
