@@ -10,120 +10,22 @@ from .forms import HabitForm
 from .models import Habit, CheckOff
 from .forms import HabitForm
 
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 from django.utils import timezone
 
 def welcome(request):
     return render(request, 'habit_tracker/welcome.html')
 
-# def create_example_habits(user):
-#     if Habit.objects.filter(user=user).count() == 0:
-#         # No habits found for this user, let's create some example habits
-
-#         # Create a habit that's already done due to time
-#         exercise_habit = Habit.objects.create(
-#             user=user,
-#             name="Exercise (Time Ended)",
-#             period=Habit.DAILY,
-#             start_date=date.today() - timedelta(days=30),
-#             end_date=date.today() - timedelta(days=1),
-#             completed=False
-#         )
-#         # Adding irregular check-offs, skipping some days
-#         for i in [0, 1, 3, 7, 14, 21, 28]:
-#             CheckOff.objects.create(
-#                 habit=exercise_habit,
-#                 timestamp=date.today() - timedelta(days=i)
-#             )
-
-
-#         # Create a habit that's fully completed
-#         habit2 = Habit.objects.create(
-#             user=user,
-#             name="Read Every Day (Fully Completed)",
-#             period=Habit.DAILY,
-#             start_date=date.today() - timedelta(days=30),
-#             end_date=date.today() + timedelta(days=30),
-#             completed=True
-#         )
-#         # Add check-offs for this habit
-#         for i in range(30):
-#             CheckOff.objects.create(
-#                 habit=habit2,
-#                 timestamp=date.today() - timedelta(days=i)
-#             )
-
-#         # Create a habit with a long streak of 365 days
-#         habit_long_streak = Habit.objects.create(
-#             user=user,
-#             name="Meditate (Long Streak)",
-#             period=Habit.DAILY,
-#             start_date=date.today() - timedelta(days=365),
-#             end_date=date.today(),
-#             completed=False
-#         )
-#         for i in range(365):
-#             CheckOff.objects.create(
-#                 habit=habit_long_streak,
-#                 timestamp=date.today() - timedelta(days=i)
-#             )
-
-#         # Create a habit with a short streak of 5 days
-#         habit_short_streak = Habit.objects.create(
-#             user=user,
-#             name="Learn Something New (Short Streak)",
-#             period=Habit.DAILY,
-#             start_date=date.today() - timedelta(days=5),
-#             end_date=date.today(),
-#             completed=False
-#         )
-#         for i in range(5):
-#             CheckOff.objects.create(
-#                 habit=habit_short_streak,
-#                 timestamp=date.today() - timedelta(days=i)
-#             )
-
-#         # Create a weekly habit for eating kebabs
-#         kebab_habit = Habit.objects.create(
-#             user=user,
-#             name="Eat Kebab :) (Weekly)",
-#             period=Habit.WEEKLY,
-#             start_date=date.today() - timedelta(weeks=4),
-#             end_date=date.today() + timedelta(weeks=4),
-#             completed=False
-#         )
-#         # Adding regular weekly check-offs
-#         for i in range(4):
-#             CheckOff.objects.create(
-#                 habit=kebab_habit,
-#                 timestamp=date.today() - timedelta(weeks=i)
-#             )
-
-#         # Create a monthly habit for connecting with loved ones
-#         connect_habit = Habit.objects.create(
-#             user=user,
-#             name="Connect with Loved Ones (Monthly)",
-#             period=Habit.MONTHLY,
-#             start_date=date.today() - timedelta(days=90),
-#             end_date=date.today() + timedelta(days=90),
-#             completed=False
-#         )
-#         # Adding regular monthly check-offs
-#         for i in range(3):
-#             CheckOff.objects.create(
-#                 habit=connect_habit,
-#                 timestamp=date.today() - timedelta(days=30*i)
-#             )
-from datetime import date, timedelta, datetime
 
 def create_example_habits(user):
     if Habit.objects.filter(user=user).count() == 0:
         # Helper function to update timestamp
         def update_timestamp(checkoff, days_ago):
-            checkoff.timestamp = datetime.combine(date.today() - timedelta(days=days_ago), datetime.min.time())
+            naive_datetime = datetime.combine(date.today() - timedelta(days=days_ago), datetime.min.time())
+            checkoff.timestamp = timezone.make_aware(naive_datetime)
             checkoff.save(update_fields=['timestamp'])
 
-        # Create a habit that's already done due to time
+        # DEFAULT HABIT EXAMPLES
         exercise_habit = Habit.objects.create(
             user=user,
             name="Exercise (Time Ended)",
@@ -136,7 +38,6 @@ def create_example_habits(user):
             checkoff = CheckOff.objects.create(habit=exercise_habit)
             update_timestamp(checkoff, i)
 
-        # And so on for the other habits
         habit2 = Habit.objects.create(
             user=user,
             name="Read Every Day (Fully Completed)",
@@ -169,7 +70,7 @@ def create_example_habits(user):
             end_date=date.today(),
             completed=False
         )
-        for i in range(5):
+        for i in range(1, 5):
             checkoff = CheckOff.objects.create(habit=habit_short_streak)
             update_timestamp(checkoff, i)
 
@@ -181,9 +82,9 @@ def create_example_habits(user):
             end_date=date.today() + timedelta(weeks=4),
             completed=False
         )
-        for i in range(4):
+        for i in range(1, 4):
             checkoff = CheckOff.objects.create(habit=kebab_habit)
-            update_timestamp(checkoff, 7*i)  # Assuming weeks are 7 days
+            update_timestamp(checkoff, 7*i)  
 
         connect_habit = Habit.objects.create(
             user=user,
@@ -206,8 +107,8 @@ def habit_list(request):
     # Filter habits based on the start and end date
     habits_to_do_today = Habit.objects.filter(
         user=request.user,
-        start_date__lte=today,  # Habit's start date is less than or equal to today
-        end_date__gte=today,    # Habit's end date is greater than or equal to today
+        start_date__lte=today,  
+        end_date__gte=today,    
         completed=False
     )
 
@@ -226,8 +127,8 @@ def create_habit(request):
             habit = form.save(commit=False)
             habit.user = request.user
             habit.save()
-            messages.success(request, 'Habit successfully added!')  # Add this line
-            return HttpResponseRedirect('/habit_tracker/')  # Redirect to habit_list
+            messages.success(request, 'Habit successfully added!')  
+            return HttpResponseRedirect('/habit_tracker/')  
     else:
         form = HabitForm()
 
@@ -240,7 +141,7 @@ def edit_habit(request, habit_id):
     
     if request.method == 'POST':
         if 'check_off' in request.POST:
-            habit.completed = True  # Set the habit's completed field to True
+            habit.completed = True  
             habit.save()
             messages.success(request, "Habit marked as completed!")
             return redirect('habit_list')
@@ -257,8 +158,8 @@ def show_current_habits(request):
     today = date.today()
     current_habits = Habit.objects.filter(
         user=request.user,
-        start_date__lte=today,  # Habit's start date is less than or equal to today
-        end_date__gte=today,    # Habit's end date is greater than or equal to today
+        start_date__lte=today,  
+        end_date__gte=today,    
         completed=False
     )
     return render(request, 'habit_tracker/current_habits.html', {'current_habits': current_habits})
@@ -293,7 +194,6 @@ def show_streaks(request):
             streak = 0
             prev_date = checkoffs.first().timestamp.date()
 
-            # Określ wymagany interwał na podstawie periody nawyku
             if habit.period == 'Daily':
                 required_interval = 1
             elif habit.period == 'Weekly':
@@ -333,7 +233,7 @@ def show_repetitions(request):
         elif habit.period == Habit.WEEKLY:
             total_reps = total_days // 7
         elif habit.period == Habit.MONTHLY:
-            total_reps = total_days // 30  # Approximate days in a month
+            total_reps = total_days // 30  
         
         # Calculate remaining repetitions
         done_reps = CheckOff.objects.filter(habit=habit).count()
@@ -363,6 +263,4 @@ def toggle_habit_done(request, habit_id):
         CheckOff.objects.create(habit=habit)
     
     return redirect('habit_list')
-
-
 
