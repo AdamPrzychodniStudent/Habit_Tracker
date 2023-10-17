@@ -8,6 +8,7 @@ urlpatterns = [
     path('current_habits/', views.show_current_habits, name='show_current_habits'),
     path('completed_habits/', views.show_completed_habits, name='show_completed_habits'),
     path('show_streaks/', views.show_streaks, name='show_streaks'),
+    path('struggled_habits/', views.show_struggled_habits, name='show_struggled_habits'),
     path('repetitions/', views.show_repetitions, name='show_repetitions'),
     path('toggle_habit_done/<int:habit_id>/', views.toggle_habit_done, name='toggle_habit_done'),
 ]

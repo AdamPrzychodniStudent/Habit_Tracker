@@ -218,6 +218,50 @@ def show_streaks(request):
     return render(request, 'habit_tracker/show_streaks.html', {'streaks': sorted_streaks})
 
 
+from django.db.models import Count
+
+@login_required
+def show_struggled_habits(request):
+    last_month_start = date.today() - timedelta(days=30)
+    last_month_end = date.today()
+    
+    habits = Habit.objects.filter(
+        user=request.user,
+        start_date__lte=last_month_end,
+        end_date__gte=last_month_start
+    )
+    
+    struggled_habits_data = []
+    
+    for habit in habits:
+        if habit.period == Habit.DAILY:
+            total_days_last_month = (last_month_end - max(habit.start_date, last_month_start)).days + 1
+        elif habit.period == Habit.WEEKLY:
+            total_days_last_month = ((last_month_end - max(habit.start_date, last_month_start)).days // 7) + 1
+        elif habit.period == Habit.MONTHLY:
+            total_days_last_month = ((last_month_end - max(habit.start_date, last_month_start)).days // 30) + 1
+            
+        checkoffs_last_month = CheckOff.objects.filter(
+            habit=habit,
+            timestamp__date__gte=max(habit.start_date, last_month_start),
+            timestamp__date__lte=min(habit.end_date, last_month_end)
+        ).count()
+        
+        missed_days = total_days_last_month - checkoffs_last_month
+        struggle_score = (missed_days / total_days_last_month) * 100  # percentage of missed days
+        
+        struggled_habits_data.append({
+            'name': habit.name,
+            'struggle_score': struggle_score
+        })
+        
+    sorted_struggled_habits = sorted(struggled_habits_data, key=lambda x: x['struggle_score'], reverse=True)
+    
+    return render(request, 'habit_tracker/show_struggled_habits.html', {'struggled_habits': sorted_struggled_habits})
+
+
+
+
 
 @login_required
 def show_repetitions(request):
