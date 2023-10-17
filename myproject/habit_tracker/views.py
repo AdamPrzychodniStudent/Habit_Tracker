@@ -164,6 +164,12 @@ def show_current_habits(request):
     )
     return render(request, 'habit_tracker/current_habits.html', {'current_habits': current_habits})
 
+@login_required
+def show_same_periodicity_habits(request, period):
+    habits = Habit.objects.filter(user=request.user, period=period)
+    return render(request, 'habit_tracker/same_periodicity_habits.html', {'habits': habits, 'period': period})
+
+
 
 @login_required
 def show_completed_habits(request):
@@ -191,31 +197,31 @@ def show_streaks(request):
     for habit in user_habits:
         checkoffs = CheckOff.objects.filter(habit=habit).order_by('timestamp')
         if checkoffs.exists():
-            streak = 0
+            current_streak = 0
+            longest_streak = 0
+            temp_streak = 0
             prev_date = checkoffs.first().timestamp.date()
-
-            if habit.period == 'Daily':
-                required_interval = 1
-            elif habit.period == 'Weekly':
-                required_interval = 7
-            else:  # Monthly
-                required_interval = 30
 
             for checkoff in checkoffs[1:]:
                 curr_date = checkoff.timestamp.date()
 
-                if (curr_date - prev_date).days == required_interval:
-                    streak += 1
+                if (curr_date - prev_date).days == 1:
+                    temp_streak += 1
                 else:
-                    streak = 1
+                    temp_streak = 0
 
+                longest_streak = max(longest_streak, temp_streak)
                 prev_date = curr_date
 
-            streaks_data.append({'name': habit.name, 'streak': streak})
+            streaks_data.append({
+                'name': habit.name, 
+                'streak': longest_streak  # change this to the longest streak
+            })
 
     sorted_streaks = sorted(streaks_data, key=lambda x: x['streak'], reverse=True)
 
     return render(request, 'habit_tracker/show_streaks.html', {'streaks': sorted_streaks})
+
 
 
 from django.db.models import Count
@@ -258,9 +264,6 @@ def show_struggled_habits(request):
     sorted_struggled_habits = sorted(struggled_habits_data, key=lambda x: x['struggle_score'], reverse=True)
     
     return render(request, 'habit_tracker/show_struggled_habits.html', {'struggled_habits': sorted_struggled_habits})
-
-
-
 
 
 @login_required

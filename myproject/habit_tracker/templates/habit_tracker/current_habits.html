@@ -27,4 +27,11 @@
         {% endfor %}
     </tbody>
   </table>
+  
+  <div class="button-container">
+    <a href="{% url 'show_same_periodicity_habits' 'Daily' %}" class="btn">Show All Daily Habits</a>
+    <a href="{% url 'show_same_periodicity_habits' 'Weekly' %}" class="btn">Show All Weekly Habits</a>
+    <a href="{% url 'show_same_periodicity_habits' 'Monthly' %}" class="btn">Show All Monthly Habits</a>
+</div>
+
 {% endblock %}
