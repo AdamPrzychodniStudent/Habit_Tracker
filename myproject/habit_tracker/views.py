@@ -4,8 +4,6 @@ from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Habit
-from .forms import HabitForm  
 
 from .models import Habit, CheckOff
 from .forms import HabitForm
@@ -13,11 +11,26 @@ from .forms import HabitForm
 from datetime import date, timedelta, datetime
 from django.utils import timezone
 
+
+# Welcome view
 def welcome(request):
+    """
+    Renders the welcome page.
+
+    :param request: HttpRequest object
+    :return: HttpResponse object containing rendered HTML
+    """
     return render(request, 'habit_tracker/welcome.html')
 
 
+# Function to create example habits for a user
 def create_example_habits(user):
+    """
+    Creates example habits for a new user.
+
+    :param user: User object
+    :return: None
+    """
     if Habit.objects.filter(user=user).count() == 0:
         # Helper function to update timestamp
         def update_timestamp(checkoff, days_ago):
@@ -99,8 +112,15 @@ def create_example_habits(user):
             update_timestamp(checkoff, 30*i)
 
 
+# Display a list of habits
 @login_required
 def habit_list(request):
+    """
+    Lists habits that need to be done today for the logged-in user.
+
+    :param request: HttpRequest object
+    :return: HttpResponse object containing rendered HTML
+    """
     create_example_habits(request.user)
     today = date.today()
 
@@ -119,8 +139,15 @@ def habit_list(request):
     return render(request, 'habit_tracker/habit_list.html', {'habits': habits_to_do_today, 'done_habits': done_habits})
 
 
+# Create a new habit
 @login_required
 def create_habit(request):
+    """
+    Creates a new habit.
+
+    :param request: HttpRequest object
+    :return: HttpResponse object containing rendered HTML
+    """
     if request.method == "POST":
         form = HabitForm(request.POST)
         if form.is_valid():
@@ -135,8 +162,16 @@ def create_habit(request):
     return render(request, 'habit_tracker/create_habit.html', {'form': form})
 
 
+# Edit an existing habit
 @login_required
 def edit_habit(request, habit_id):
+    """
+    Edits an existing habit identified by habit_id.
+
+    :param request: HttpRequest object
+    :param habit_id: Integer, the id of the habit to edit
+    :return: HttpResponse object containing rendered HTML
+    """
     habit = get_object_or_404(Habit, id=habit_id)
     
     if request.method == 'POST':
@@ -153,8 +188,38 @@ def edit_habit(request, habit_id):
     return render(request, 'habit_tracker/edit_habit.html', {'habit': habit})
 
 
+# Function toggles the "done" status of a specific habit for today
+@login_required
+def toggle_habit_done(request, habit_id):
+    """
+    Toggles the "done" status of a specific habit for today.
+
+    :param request: HttpRequest object
+    :param habit_id: Integer, the id of the habit to toggle
+    :return: HttpResponse object redirecting to habit_list view
+    """
+    habit = get_object_or_404(Habit, id=habit_id)
+    
+    # Check if habit is already done today
+    today = timezone.now().date()
+    checkoff = CheckOff.objects.filter(habit=habit, timestamp__date=today).first()
+
+    if checkoff:
+        checkoff.delete()
+    else:
+        CheckOff.objects.create(habit=habit)
+    
+    return redirect('habit_list')
+
+# Show the currently active habits
 @login_required
 def show_current_habits(request):
+    """
+    Shows the currently active habits for the logged-in user.
+
+    :param request: HttpRequest object
+    :return: HttpResponse object containing rendered HTML
+    """
     today = date.today()
     current_habits = Habit.objects.filter(
         user=request.user,
@@ -164,15 +229,30 @@ def show_current_habits(request):
     )
     return render(request, 'habit_tracker/current_habits.html', {'current_habits': current_habits})
 
+
+# Show habits which have the same periodicty e.g. Daily 
 @login_required
 def show_same_periodicity_habits(request, period):
+    """
+    Shows habits for the logged-in user with the same periodicity.
+
+    :param request: HttpRequest object
+    :param period: String, periodicity of the habits to filter
+    :return: HttpResponse object containing rendered HTML
+    """
     habits = Habit.objects.filter(user=request.user, period=period)
     return render(request, 'habit_tracker/same_periodicity_habits.html', {'habits': habits, 'period': period})
 
 
-
+# Show habits which user completed
 @login_required
 def show_completed_habits(request):
+    """
+    Shows the habits that the logged-in user has completed.
+
+    :param request: HttpRequest object
+    :return: HttpResponse object containing rendered HTML
+    """
     today = date.today()
     completed_habits_done = Habit.objects.filter(
         user=request.user,
@@ -189,8 +269,15 @@ def show_completed_habits(request):
     })
 
 
+# Show how long are the streak in habits
 @login_required
 def show_streaks(request):
+    """
+    Shows the length of streaks for each habit of the logged-in user.
+
+    :param request: HttpRequest object
+    :return: HttpResponse object containing rendered HTML
+    """
     user_habits = Habit.objects.filter(user=request.user)
     streaks_data = []
 
@@ -224,10 +311,15 @@ def show_streaks(request):
 
 
 
-from django.db.models import Count
-
+# Calculate and show with what habits user has issues
 @login_required
 def show_struggled_habits(request):
+    """
+    Shows habits with which the logged-in user has issues or struggles.
+
+    :param request: HttpRequest object
+    :return: HttpResponse object containing rendered HTML
+    """
     last_month_start = date.today() - timedelta(days=30)
     last_month_end = date.today()
     
@@ -266,8 +358,15 @@ def show_struggled_habits(request):
     return render(request, 'habit_tracker/show_struggled_habits.html', {'struggled_habits': sorted_struggled_habits})
 
 
+# Show how many repition are already checked off and how many left 
 @login_required
 def show_repetitions(request):
+    """
+    Shows the number of repetitions completed and remaining for each habit.
+
+    :param request: HttpRequest object
+    :return: HttpResponse object containing rendered HTML
+    """
     habits = Habit.objects.filter(user=request.user)
     habit_repetitions = []
     
@@ -293,21 +392,4 @@ def show_repetitions(request):
         })
 
     return render(request, 'habit_tracker/show_repetitions.html', {'habit_repetitions': habit_repetitions})
-
-
-
-@login_required
-def toggle_habit_done(request, habit_id):
-    habit = get_object_or_404(Habit, id=habit_id)
-    
-    # Check if habit is already done today
-    today = timezone.now().date()
-    checkoff = CheckOff.objects.filter(habit=habit, timestamp__date=today).first()
-
-    if checkoff:
-        checkoff.delete()
-    else:
-        CheckOff.objects.create(habit=habit)
-    
-    return redirect('habit_list')
 
