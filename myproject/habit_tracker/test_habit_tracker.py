@@ -301,3 +301,120 @@ class ShowCurrentHabitsTest(HabitTestBase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'habit_tracker/current_habits.html')
         self.assertIn(self.habit, response.context['current_habits'])
+
+
+
+
+class HabitViewTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='testpass')
+        self.client.login(username='testuser', password='testpass')
+        self.habit = Habit.objects.create(
+            user=self.user,
+            name="Test Habit",
+            period="Daily",
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=30),
+            completed=False
+        )
+
+    def test_show_same_periodicity_habits(self):
+        response = self.client.get(reverse('show_same_periodicity_habits', args=['Daily']))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'habit_tracker/same_periodicity_habits.html')
+        self.assertIn(self.habit, response.context['habits'])
+
+    def test_show_completed_habits(self):
+        response = self.client.get(reverse('show_completed_habits'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'habit_tracker/completed_habits.html')
+
+    def test_show_streaks(self):
+        response = self.client.get(reverse('show_streaks'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'habit_tracker/show_streaks.html')
+
+
+class HabitStruggleRepetitionTestBase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='testpass')
+        self.client.login(username='testuser', password='testpass')
+        self.habit_daily = Habit.objects.create(
+            user=self.user,
+            name="Test Habit Daily",
+            period=Habit.DAILY,
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=30),
+            completed=False
+        )
+        self.habit_weekly = Habit.objects.create(
+            user=self.user,
+            name="Test Habit Weekly",
+            period=Habit.WEEKLY,
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=30),
+            completed=False
+        )
+
+
+class ShowStruggledHabitsTest(HabitStruggleRepetitionTestBase):
+    def test_show_struggled_habits(self):
+        # Create some CheckOffs to simulate habits being followed or missed
+        CheckOff.objects.create(habit=self.habit_daily)
+        
+        response = self.client.get(reverse('show_struggled_habits'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'habit_tracker/show_struggled_habits.html')
+        
+        struggled_habits = response.context['struggled_habits']
+        self.assertEqual(len(struggled_habits), 2)  # You should have 2 habits in the test setup
+        
+        for habit_data in struggled_habits:
+            if habit_data['name'] == 'Test Habit Daily':
+                self.assertLess(habit_data['struggle_score'], 50)  # Assuming you're struggling less with this habit
+            else:
+                self.assertGreaterEqual(habit_data['struggle_score'], 50)  # Assuming you're struggling more with this habit
+
+
+class ShowRepetitionsTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='testpass')
+        self.client.login(username='testuser', password='testpass')
+        
+        # Create a daily habit with 30 repetitions
+        self.habit_daily = Habit.objects.create(
+            user=self.user,
+            name='Test Habit Daily',
+            period=Habit.DAILY,
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=29),
+            completed=False
+        )
+        
+        # Create a weekly habit with 4 repetitions
+        self.habit_weekly = Habit.objects.create(
+            user=self.user,
+            name='Test Habit Weekly',
+            period=Habit.WEEKLY,
+            start_date=date.today(),
+            end_date=date.today() + timedelta(weeks=3),
+            completed=False
+        )
+
+    def test_show_repetitions(self):
+        # Create some CheckOffs to simulate habits being followed
+        CheckOff.objects.create(habit=self.habit_daily)
+        
+        response = self.client.get(reverse('show_repetitions'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'habit_tracker/show_repetitions.html')
+        
+        habit_repetitions = response.context['habit_repetitions']
+        self.assertEqual(len(habit_repetitions), 2)  # You should have 2 habits in the test setup
+        
+        for habit_data in habit_repetitions:
+            if habit_data['name'] == 'Test Habit Daily':
+                self.assertEqual(habit_data['remaining_reps'], 29)  # 30 - 1 = 29
+            elif habit_data['name'] == 'Test Habit Weekly':
+                self.assertEqual(habit_data['remaining_reps'], 3)  # No CheckOffs for this habit, so remaining reps should be 3
+
