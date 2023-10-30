@@ -8,7 +8,7 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from django.core.management import call_command
 
-from datetime import datetime, date  
+from datetime import datetime, date, timedelta  
 
 import pytest
 from django.contrib.auth.models import User
@@ -16,8 +16,11 @@ from django.utils import timezone
 from habit_tracker.models import Habit, CheckOff
 from habit_tracker.utils import update_timestamp, create_example_habits
 
+from django.test import TestCase
+from habit_tracker.forms import HabitForm
 
-# Test for models.py
+
+# Tests for models.py
 
 @pytest.mark.django_db
 def test_create_habit():
@@ -129,14 +132,26 @@ def test_create_example_habits():
     connect_habit = Habit.objects.get(name="Connect with Loved Ones (Monthly)")
     assert CheckOff.objects.filter(habit=connect_habit).count() == 3
 
+
+# Setup 
+
+class HabitTestBase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='testpass')
+        self.client.login(username='testuser', password='testpass')
+        self.habit = Habit.objects.create(
+            user=self.user,
+            name="Test Habit",
+            period="Daily",
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=30),
+            completed=False
+        )
+
+
 # Test for forms.py 
 
-from django.test import TestCase
-from habit_tracker.forms import HabitForm
-
-# Test for forms.py
-
-class HabitFormTest(TestCase):
+class HabitFormTest(HabitTestBase):  
 
     def test_valid_form(self):
         data = {
@@ -178,3 +193,111 @@ class HabitFormTest(TestCase):
         form = HabitForm(data)
         self.assertFalse(form.is_valid())
         self.assertIn('end_date', form.errors)
+
+
+# Tests for views.py
+
+from django.test import TestCase
+from django.urls import reverse
+
+class WelcomeViewTest(TestCase):
+    def test_welcome_view(self):
+
+        response = self.client.get(reverse('welcome'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'habit_tracker/welcome.html')
+
+
+class HabitListViewTest(HabitTestBase):  
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='testpass')
+        self.client.login(username='testuser', password='testpass')
+
+    def test_habit_list(self):
+        response = self.client.get(reverse('habit_list'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'habit_tracker/habit_list.html')
+
+
+class CreateHabitViewTest(HabitTestBase):  
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='testpass')
+        self.client.login(username='testuser', password='testpass')
+
+    def test_create_habit_get(self):
+        response = self.client.get(reverse('create_habit'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'habit_tracker/create_habit.html')
+
+    def test_create_habit_post(self):
+        response = self.client.post(reverse('create_habit'), {
+            'name': 'Exercise',
+            'period': 'Daily',
+            'start_date': '2023-01-01',
+            'end_date': '2023-12-31'
+        })
+        self.assertRedirects(response, reverse('habit_list'))
+        self.assertEqual(Habit.objects.count(), 1)
+
+
+class EditHabitViewTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='testpass')
+        self.client.login(username='testuser', password='testpass')
+        self.habit = Habit.objects.create(
+            user=self.user, 
+            name="Test Habit", 
+            period="Daily", 
+            start_date=date.today(), 
+            end_date=date.today() + timedelta(days=30),
+            completed=False
+        )
+        
+    def test_edit_habit_get(self):
+        response = self.client.get(reverse('edit_habit', args=[self.habit.id]))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'habit_tracker/edit_habit.html')
+        
+    def test_edit_habit_post_checkoff(self):
+        response = self.client.post(reverse('edit_habit', args=[self.habit.id]), {'check_off': 'true'})
+        self.habit.refresh_from_db()
+        self.assertTrue(self.habit.completed)
+        
+    def test_edit_habit_post_delete(self):
+        response = self.client.post(reverse('edit_habit', args=[self.habit.id]), {'delete_habit': 'true'})
+        self.assertFalse(Habit.objects.filter(id=self.habit.id).exists())
+
+
+class EditHabitViewTest(HabitTestBase):  
+    
+    def test_edit_habit_get(self):
+        response = self.client.get(reverse('edit_habit', args=[self.habit.id]))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'habit_tracker/edit_habit.html')
+        
+    def test_edit_habit_post_checkoff(self):
+        response = self.client.post(reverse('edit_habit', args=[self.habit.id]), {'check_off': 'true'})
+        self.habit.refresh_from_db()
+        self.assertTrue(self.habit.completed)
+        
+    def test_edit_habit_post_delete(self):
+        response = self.client.post(reverse('edit_habit', args=[self.habit.id]), {'delete_habit': 'true'})
+        self.assertFalse(Habit.objects.filter(id=self.habit.id).exists())
+
+
+class ToggleHabitDoneTest(HabitTestBase):  
+
+    def test_toggle_habit_done(self):
+        initial_count = CheckOff.objects.filter(habit=self.habit).count()
+        self.client.get(reverse('toggle_habit_done', args=[self.habit.id]))
+        final_count = CheckOff.objects.filter(habit=self.habit).count()
+        self.assertEqual(final_count, initial_count + 1)
+        
+
+class ShowCurrentHabitsTest(HabitTestBase):  
+    
+    def test_show_current_habits(self):
+        response = self.client.get(reverse('show_current_habits'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'habit_tracker/current_habits.html')
+        self.assertIn(self.habit, response.context['current_habits'])
