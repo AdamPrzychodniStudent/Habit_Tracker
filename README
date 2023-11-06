@@ -1,0 +1,31 @@
+Open Github Codespaces 
+
+Run this command 
+
+Initialize Conda for Your Shell
+
+. /opt/conda/etc/profile.d/conda.sh
+
+conda create --name myenv python=3.11.4
+
+conda activate myenv
+
+pip install -r myproject/requirements.txt
+
+cd myproject
+
+python manage.py makemigrations
+
+python manage.py migrate
+
+python manage.py runserver
+
+Login as Admin or User:
+
+Username: admin
+Password: adminpassword
+
+Username: user 
+Password: userpassword
+
+
