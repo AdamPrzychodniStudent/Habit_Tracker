@@ -33,3 +33,8 @@ Password: userpassword
 When you are logging for the first time it might take a while to load the page.
 
 
+new 
+
+chmod +x setup_myenv.sh
+
+./setup_myenv.sh

@@ -15,7 +15,7 @@ conda activate myenv
 pip install -r /workspaces/Habit_Tracker/myproject/requirements.txt
 
 # Navigate to the Django project directory
-cd /path/to/your/myproject
+cd /workspaces/Habit_Tracker/myproject
 
 # Make and apply database migrations
 python manage.py makemigrations
