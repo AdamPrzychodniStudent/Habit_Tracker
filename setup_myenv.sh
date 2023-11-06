@@ -11,11 +11,11 @@ source /opt/conda/etc/profile.d/conda.sh
 # Activate the environment
 conda activate myenv
 
-# Install the Python dependencies from requirements.txt
-pip install -r /workspaces/Habit_Tracker/myproject/requirements.txt
-
 # Navigate to the Django project directory
-cd /workspaces/Habit_Tracker/myproject
+cd myproject
+
+# Install the Python dependencies from requirements.txt
+pip install -r requirements.txt
 
 # Make and apply database migrations
 python manage.py makemigrations

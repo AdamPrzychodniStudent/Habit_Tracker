@@ -38,3 +38,11 @@ new
 chmod +x setup_myenv.sh
 
 ./setup_myenv.sh
+
+. /opt/conda/etc/profile.d/conda.sh
+
+conda activate myenv
+
+cd myproject
+
+python manage.py runserver
