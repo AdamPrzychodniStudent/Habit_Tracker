@@ -1,7 +1,7 @@
 {% extends "habit_tracker/base.html" %}
 
 {% block content %}
-  <h2>Habit list</h2>
+  <h2>Habit for today &#x1F642;</h2>
 
   {% if messages %}
   <!-- Message Modal -->
@@ -15,17 +15,42 @@
   </div>
   {% endif %}
 
-  <ul>
-    {% for habit in habits %}
-      <li>{{ habit.name }} ({{ habit.period }})</li>
-    {% empty %}
-      <li>No active habits yet.</li>
-    {% endfor %}
-  </ul>
+  <table border="1">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Period</th>
+            <th>Done</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for habit in habits %}
+        <tr>
+            <td><a href="{% url 'edit_habit' habit.id %}" class="edit-link">{{ habit.name }}</a></td>
+            <td>{{ habit.period }}</td>
+            <td>
+              <a href="{% url 'toggle_habit_done' habit.id %}" class="checkbox">
+                {% if habit.id in done_habits %}
+                &#10003; <!-- This is a check mark -->
+                {% else %}
+                &#9744; <!-- This is an empty square -->
+                {% endif %}
+              </a>
+            </td>                    
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="3">You have no habits scheduled for today.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
-  <!-- Link to the create_habit view -->
-  <p>
+  <div class="button-container">
     <a href="{% url 'create_habit' %}" class="btn">Create a new habit</a>
-  </p>
+    <a href="{% url 'show_current_habits' %}" class="btn">Show all current habits</a>
+    <a href="{% url 'show_completed_habits' %}" class="btn">Show completed habits</a>
+    <a href="{% url 'show_streaks' %}" class="btn">View Streaks</a>
+    <a href="{% url 'show_repetitions' %}" class="btn">Repetitions</a>
+  </div>
 {% endblock %}
-

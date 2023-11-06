@@ -1,0 +1,30 @@
+{% extends "habit_tracker/base.html" %}
+
+{% block content %}
+  <h2>All {{ period }} Habits</h2>
+
+  <table border="1">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Completed</th>
+        </tr>
+    </thead>
+    <tbody>
+      {% for habit in habits %}
+      <tr>
+          <td>{{ habit.name }}</td>
+          <td>{% if habit.completed %}Yes{% else %}No{% endif %}</td>
+      </tr>
+      {% empty %}
+      <tr>
+          <td colspan="2">You have no {{ period }} habits.</td>
+      </tr>
+      {% endfor %}
+  </tbody>
+  
+  </table>
+  <div class="button-container">
+    <a href="{% url 'show_current_habits' %}" class="btn">Go back to Current Habits</a>
+  </div>
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends "habit_tracker/base.html" %}
+
+{% block content %}
+  <h2>Edit Habit: {{ habit.name }}</h2>
+  
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" name="check_off" class="btn">Checked off habit</button>
+    <button type="submit" name="delete_habit" class="btn">Delete habit</button>
+  </form>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "habit_tracker/base.html" %}
+
+{% block content %}
+  <h2>Habits Struggled With Most Last Month</h2>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Struggle Score</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for habit in struggled_habits %}
+      <tr>
+        <td>{{ habit.name }}</td>
+        <td>{{ habit.struggle_score|floatformat:2 }}%</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  
+  <div class="button-container">
+    <a href="{% url 'show_streaks' %}" class="btn">Go back to Show Streaks</a>
+  </div>
+
+  <h3>How Is the Struggle Score Calculated?</h3>
+  <p>
+    The Struggle Score is a measure of how much you've struggled with a habit over the last month. The way it's calculated depends on the type of habit:
+  </p>
+  <ul>
+    <li><strong>Daily Habits:</strong> Struggle Score = (Number of Missed Days / Total Days in the Last Month) * 100</li>
+    <li><strong>Weekly Habits:</strong> Struggle Score = (Number of Missed Weeks / Total Weeks in the Last Month) * 100</li>
+    <li><strong>Monthly Habits:</strong> Struggle Score = (Number of Missed Months / Total Months in the Last Month) * 100</li>
+  </ul>
+  <p>
+    For example, if you missed 3 days of a daily habit in the last month, your Struggle Score would be (3/30) * 100 = 10%.
+  </p>
+  <p>
+    Remember, the lower the score, the better 😊
+  </p>
+  
+{% endblock %}

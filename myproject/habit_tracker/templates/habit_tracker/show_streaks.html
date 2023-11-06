@@ -1,0 +1,25 @@
+{% extends "habit_tracker/base.html" %}
+
+{% block content %}
+  <h2>Streaks - longest to shortest</h2>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Longest Streak</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for streak in streaks %}
+      <tr>
+        <td>{{ streak.name }}</td>
+        <td>{{ streak.streak }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="button-container">
+    <a href="{% url 'show_struggled_habits' %}" class="btn">View Habits Struggled With Most Last Month</a>
+  </div>
+{% endblock %}
+
