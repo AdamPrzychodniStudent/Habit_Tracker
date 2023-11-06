@@ -1,93 +1,66 @@
-Open Github Codespaces 
-
-Run this command 
-
-chmod +x setup_myenv.sh
-
-./setup_myenv.sh
-
-. /opt/conda/etc/profile.d/conda.sh
-
-conda activate myenv
-
-cd myproject
-
-python manage.py runserver
-
-
-Login as Admin or User:
-
-Username: admin
-Password: adminpassword
-
-Username: user 
-Password: userpassword
-
-When you are logging for the first time it might take a while to load the page.
-
 # Project Setup Guide
 
-Welcome to our project! Follow these steps to get your development environment up and running with Github Codespaces.
+Welcome to my University Habit Tracker Project! Follow these steps to get your development environment up and running with Github Codespaces.
 
 ## Step 1: Initialize your environment
 
 1. **Open Github Codespaces** for the repository.
 2. **Prepare the environment setup script** by running the following command:
 
-'''
+```
 chmod +x setup_myenv.sh
-'''
+```
 
 3. **Execute the setup script** to configure your environment:
 
-'''
+```
 ./setup_myenv.sh
-'''
+```
 
 
 ## Step 2: Activate the environment
 
 1. **Source the Conda configuration**:
 
-'''
+```
 . /opt/conda/etc/profile.d/conda.sh
-'''
+```
 
 2. **Activate your Conda environment**:
 
-'''
+```
 conda activate myenv
-'''
+```
 
 
 ## Step 3: Start the development server
 
 1. **Navigate to your project directory**:
 
-'''
+```
 cd myproject
-'''
+```
 
 2. **Run the Django development server**:
 
-'''
+```
 python manage.py runserver
-'''
+```
 
 
 ## Step 4: Access the application
 
 **Login credentials**:
 
-- **Admin access:**
+**Admin access:**
 - Username: `admin`
 - Password: `adminpassword`
 
-- **User access:**
+**User access:**
 - Username: `user`
 - Password: `userpassword`
 
-**Note**: The initial page load might take some time. This is normal during the first setup.
+**Note**: The initial login load might take some time. This is normal during the first setup.
 
 ---
 
