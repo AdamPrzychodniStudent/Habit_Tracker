@@ -4,9 +4,9 @@ Run this command
 
 Initialize Conda for Your Shell
 
-. /opt/conda/etc/profile.d/conda.sh
-
 conda create --name myenv python=3.11.4
+
+. /opt/conda/etc/profile.d/conda.sh
 
 conda activate myenv
 
