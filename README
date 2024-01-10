@@ -1,26 +1,4 @@
-Open Github Codespaces 
 
-Run this command 
-
-Initialize Conda for Your Shell
-
-conda create --name myenv python=3.11.4
-
-. /opt/conda/etc/profile.d/conda.sh
-
-conda activate myenv
-
-pip install -r myproject/requirements.txt
-
-cd myproject
-
-python manage.py makemigrations
-
-python manage.py migrate
-
-clear
-
-python manage.py runserver
 
 Login as Admin or User:
 
@@ -29,17 +7,3 @@ Password: adminpassword
 
 Username: user 
 Password: userpassword
-
-python3 -m venv venv
-
-source venv/bin/activate
-
-pip install --upgrade pip
-
-pip install django
-
-cd myproject
-
-clear
-
-python manage.py runserver

@@ -19,6 +19,13 @@ from habit_tracker.utils import update_timestamp, create_example_habits
 from django.test import TestCase
 from habit_tracker.forms import HabitForm
 
+import os
+import django
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'myproject.settings')
+django.setup()
+
+
 
 # Tests for models.py
 
