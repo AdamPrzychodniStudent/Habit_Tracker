@@ -1,0 +1,12 @@
+image: gitpod/workspace-python-3.12:latest
+
+tasks:
+  - init: |
+      python3 -m venv venv
+      source venv/bin/activate
+      pip install --upgrade pip
+      pip install django
+    command: |
+      cd myproject
+      clear
+      python manage.py runserver

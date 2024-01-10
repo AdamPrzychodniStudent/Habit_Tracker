@@ -25,7 +25,7 @@ SECRET_KEY = "django-insecure-+j6@8o00t#n@he16wf(9c_+!#b+y5)+a656rs$zkeos+uiu)ax
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['.gitpod.io']
 
 
 # Application definition
@@ -123,3 +123,5 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 LOGIN_URL = '/login/'
 
 LOGIN_REDIRECT_URL = '/habit_tracker'
+
+CSRF_TRUSTED_ORIGINS = ['https://*.gitpod.io']
