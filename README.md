@@ -15,10 +15,10 @@ The Habit Tracker is a Django web application designed to help users track and m
 - **Signal Handling:** Implements Django signals to create initial users post-migration.
 - **Automated Tests:** Contains tests for models, forms, and views ensuring robust application behavior.
 
-##Running the Application in Gitpod
+## Running the Application in Gitpod
 This application is configured to be easily set up and run in a Gitpod environment. When you start a Gitpod workspace with this repository, the environment sets up automatically, installing all the necessary dependencies and applying migrations to the database.
 
-##Local Setup
+## Local Setup
 To set up this application locally, follow these steps:
 
 1. Clone the repository.
